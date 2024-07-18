@@ -20,6 +20,8 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.17.0'
+	implementation group: 'io.github.cdimascio', name: 'dotenv-java', version: '3.0.0'
+
 
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
