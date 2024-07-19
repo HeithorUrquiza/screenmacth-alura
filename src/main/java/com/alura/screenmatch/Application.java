@@ -15,6 +15,6 @@ public class Application implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		Principal principal = new Principal();
-		principal.starter();
+		principal.showMenu();
     }
 }
