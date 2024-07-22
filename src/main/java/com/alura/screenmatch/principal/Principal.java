@@ -1,6 +1,7 @@
 package com.alura.screenmatch.principal;
 
 import com.alura.screenmatch.models.SeasonData;
+import com.alura.screenmatch.models.Serie;
 import com.alura.screenmatch.models.SerieData;
 import com.alura.screenmatch.services.ApiConsumer;
 import com.alura.screenmatch.services.DataConversor;
@@ -8,6 +9,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -16,6 +18,7 @@ public class Principal {
     private ApiConsumer apiConsumer = new ApiConsumer();
     private DataConversor dataConversor = new DataConversor();
     private List<SeasonData> seasons = new ArrayList<>();
+    private List<Serie> series = new ArrayList<>();
 
 //    Constants
     private final Dotenv dotenv = Dotenv.load();
@@ -24,8 +27,10 @@ public class Principal {
 
     public void showMenu() throws InterruptedException, IOException {
         String menu = """
+                ---
                 1 - Search series
                 2 - Search episodes
+                3 - List all series searched
                 0 - Leave
                 """;
 
@@ -42,6 +47,9 @@ public class Principal {
                 case 2:
                     searchEpisodes();
                     break;
+                case 3:
+                    listAllSeriesSearched();
+                    break;
                 case 0:
                     System.out.println("Leaving...");
                     stop = true;
@@ -54,7 +62,9 @@ public class Principal {
 
     private void searchSeries() {
         SerieData serieData = getSerieData();
+        this.series.add(new Serie(serieData));
         System.out.println(serieData);
+        System.out.println();
     }
 
     private SerieData getSerieData() {
@@ -79,5 +89,12 @@ public class Principal {
             this.seasons.add(this.dataConversor.getData(seasonJson, SeasonData.class));
         }
         this.seasons.forEach(System.out::println);
+        System.out.println();
+    }
+
+    private void listAllSeriesSearched() {
+        this.series.stream()
+                .sorted(Comparator.comparing(Serie::getGenre))
+                .forEach(System.out::println);
     }
 }

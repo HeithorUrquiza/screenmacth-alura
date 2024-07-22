@@ -2,6 +2,7 @@ package com.alura.screenmatch.models;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.OptionalDouble;
 
 public class Episode {
     private Integer season;
@@ -14,12 +15,7 @@ public class Episode {
         this.season = season;
         this.title = episodeData.title();
         this.episodeNumber = episodeData.episode();
-        try {
-            this.rating = Double.valueOf(episodeData.rating());
-        }
-        catch(NumberFormatException exception) {
-            this.rating = 0.0;
-        }
+        this.rating = OptionalDouble.of(Double.parseDouble(episodeData.rating())).orElse(0);
         try {
             // DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             this.released = LocalDate.parse(episodeData.released());
