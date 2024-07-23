@@ -1,5 +1,6 @@
 package com.alura.screenmatch.principal;
 
+import com.alura.screenmatch.models.Episode;
 import com.alura.screenmatch.models.SeasonData;
 import com.alura.screenmatch.models.Serie;
 import com.alura.screenmatch.models.SerieData;
@@ -9,16 +10,15 @@ import com.alura.screenmatch.services.DataConversor;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Principal {
     private Scanner scanner = new Scanner(System.in);
     private ApiConsumer apiConsumer = new ApiConsumer();
     private DataConversor dataConversor = new DataConversor();
     private List<SeasonData> seasons = new ArrayList<>();
+    private List<Serie> series = new ArrayList<>();
     private SerieRepository serieRepository;
 
 //    Constants
@@ -84,22 +84,44 @@ public class Principal {
     }
 
     private void searchEpisodes() {
-        SerieData serieData = getSerieData();
-        for (int i = 1; i <= serieData.totalSeasons(); i++) {
-            String seasonJson = this.apiConsumer.getData(
-                    BASE_URL +
-                            serieData.title().replace(" ", "+") +
-                            "&season=" + i + API_KEY
-            );
-            this.seasons.add(this.dataConversor.getData(seasonJson, SeasonData.class));
+        this.listAllSeriesSearched();
+        System.out.print("Choose a serie by its name: ");
+        String serieName = scanner.nextLine();
+
+        Optional<Serie> optionalSerie = this.series.stream()
+                .filter(serie -> serie.getTitle().equalsIgnoreCase(serieName))
+                .findFirst();
+
+        if (optionalSerie.isPresent()) {
+            Serie foundedSerie = optionalSerie.get();
+            for (int i = 1; i <= foundedSerie.getSeasons(); i++) {
+                String seasonJson = this.apiConsumer.getData(
+                        BASE_URL +
+                                foundedSerie.getTitle().replace(" ", "+") +
+                                "&season=" + i + API_KEY
+                );
+                this.seasons.add(this.dataConversor.getData(seasonJson, SeasonData.class));
+            }
+            this.seasons.forEach(System.out::println);
+            System.out.println();
+
+            List<Episode> episodes = this.seasons.stream()
+                    .flatMap(seasonData -> seasonData.episodes().stream()
+                            .map(episodeData -> new Episode(seasonData.season(), episodeData)))
+                    .collect(Collectors.toList());
+
+            foundedSerie.setEpisodes(episodes);
+            serieRepository.save(foundedSerie);
         }
-        this.seasons.forEach(System.out::println);
-        System.out.println();
+        else {
+            System.out.println("Serie not founded");
+        }
+
     }
 
     private void listAllSeriesSearched() {
-        List<Serie> series = this.serieRepository.findAll();
-        series.stream()
+        this.series = this.serieRepository.findAll();
+        this.series.stream()
                 .sorted(Comparator.comparing(Serie::getGenre))
                 .forEach(System.out::println);
     }

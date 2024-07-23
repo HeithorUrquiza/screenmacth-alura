@@ -19,7 +19,8 @@ public class Serie {
     private String actors;
     private String poster;
     private String plot;
-    @Transient
+//    Mapping the relationship
+    @OneToMany(mappedBy = "serie", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Episode> episodes;
 
     public Serie() {}
@@ -47,6 +48,7 @@ public class Serie {
     }
 
     public void setEpisodes(List<Episode> episodes) {
+        episodes.forEach(episode -> episode.setSerie(this));
         this.episodes = episodes;
     }
 
