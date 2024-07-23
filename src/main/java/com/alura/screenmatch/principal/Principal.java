@@ -3,6 +3,7 @@ package com.alura.screenmatch.principal;
 import com.alura.screenmatch.models.SeasonData;
 import com.alura.screenmatch.models.Serie;
 import com.alura.screenmatch.models.SerieData;
+import com.alura.screenmatch.repositories.SerieRepository;
 import com.alura.screenmatch.services.ApiConsumer;
 import com.alura.screenmatch.services.DataConversor;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -18,12 +19,16 @@ public class Principal {
     private ApiConsumer apiConsumer = new ApiConsumer();
     private DataConversor dataConversor = new DataConversor();
     private List<SeasonData> seasons = new ArrayList<>();
-    private List<Serie> series = new ArrayList<>();
+    private SerieRepository serieRepository;
 
 //    Constants
     private final Dotenv dotenv = Dotenv.load();
     private final String BASE_URL = "https://www.omdbapi.com/?t=";
     private final String API_KEY = String.format("&apiKey=%s", dotenv.get("OMDB_API_KEY"));
+
+    public Principal(SerieRepository serieRepository) {
+        this.serieRepository = serieRepository;
+    }
 
     public void showMenu() throws InterruptedException, IOException {
         String menu = """
@@ -62,7 +67,7 @@ public class Principal {
 
     private void searchSeries() {
         SerieData serieData = getSerieData();
-        this.series.add(new Serie(serieData));
+        this.serieRepository.save(new Serie(serieData));
         System.out.println(serieData);
         System.out.println();
     }
@@ -93,7 +98,8 @@ public class Principal {
     }
 
     private void listAllSeriesSearched() {
-        this.series.stream()
+        List<Serie> series = this.serieRepository.findAll();
+        series.stream()
                 .sorted(Comparator.comparing(Serie::getGenre))
                 .forEach(System.out::println);
     }

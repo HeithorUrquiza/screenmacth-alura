@@ -1,15 +1,28 @@
 package com.alura.screenmatch.models;
 
+import jakarta.persistence.*;
+
+import java.util.List;
 import java.util.OptionalDouble;
 
+@Entity
+@Table(name = "series")
 public class Serie {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String title;
     private Integer seasons;
     private Double rating;
+    @Enumerated(EnumType.STRING)
     private Category genre;
     private String actors;
     private String poster;
     private String plot;
+    @Transient
+    private List<Episode> episodes;
+
+    public Serie() {}
 
     public Serie(SerieData serieData) {
         this.title = serieData.title();
@@ -19,6 +32,22 @@ public class Serie {
         this.actors = serieData.actors();
         this.poster = serieData.poster();
         this.plot = serieData.plot();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public List<Episode> getEpisodes() {
+        return episodes;
+    }
+
+    public void setEpisodes(List<Episode> episodes) {
+        this.episodes = episodes;
     }
 
     public String getTitle() {
