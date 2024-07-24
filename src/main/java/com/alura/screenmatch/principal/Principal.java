@@ -27,15 +27,18 @@ public class Principal {
         this.serieRepository = serieRepository;
     }
 
-    public void showMenu() throws InterruptedException, IOException {
+    public void showMenu() {
         String menu = """
-                ---
+                -------
                 1 - Search series
                 2 - Search episodes
                 3 - List all series searched
                 4 - Search serie by title
                 5 - Show top 5 series
                 6 - Search serie by genre
+                7 - Search episodes by sentence
+                8 - Show top 5 episodes by serie
+                9 - Search episodes by serie and year
                 0 - Leave
                 """;
 
@@ -63,6 +66,15 @@ public class Principal {
                     break;
                 case 6:
                     searchSerieByGenre();
+                    break;
+                case 7:
+                    searchEpisodesBySentence();
+                    break;
+                case 8:
+                    getTop5EpisodesBySerie();
+                    break;
+                case 9:
+                    filterEpisodesBySerieAndYear();
                     break;
                 case 0:
                     System.out.println("Leaving...");
@@ -129,7 +141,8 @@ public class Principal {
         this.series = this.serieRepository.findAll();
         this.series.stream()
                 .sorted(Comparator.comparing(Serie::getGenre))
-                .forEach(System.out::println);
+                .forEach(serie -> System.out.printf("Title: %s\n", serie.getTitle()));
+        System.out.println();
     }
 
     private void searchSerieByTitle() {
@@ -157,6 +170,36 @@ public class Principal {
         Category category = Category.getCategory(categoryName);
         List<Serie> series = this.serieRepository.findByGenre(category);
         series.forEach(serie -> System.out.printf("Title: %s | Genre: %s\n", serie.getTitle(), serie.getGenre()));
+        System.out.println();
+    }
+
+    private void searchEpisodesBySentence() {
+        System.out.print("Type the sentence to search: ");
+        String sentence = this.scanner.nextLine();
+        List<Episode> episodes = this.serieRepository.episodesBySentence(sentence);
+        episodes.forEach(episode -> System.out.printf("Serie: %s | Title: %s | Season: %s\n",
+                episode.getSerie().getTitle(), episode.getTitle(), episode.getSeason()));
+        System.out.println();
+    }
+
+    private void getTop5EpisodesBySerie() {
+        System.out.print("Type series name: ");
+        String serieTitle = this.scanner.nextLine();
+        List<Episode> episodes = this.serieRepository.getTop5EpisodesBySerie(serieTitle);
+        episodes.forEach(episode -> System.out.printf("Title: %s | Season: %d, Rating: %.1f\n",
+                episode.getTitle(), episode.getSeason(), episode.getRating()));
+        System.out.println();
+    }
+
+    private void filterEpisodesBySerieAndYear() {
+        System.out.print("Serie name: ");
+        String serieTitle = this.scanner.nextLine();
+        System.out.print("Year: ");
+        int year = this.scanner.nextInt();
+        this.scanner.nextLine();
+        List<Episode> episodes = this.serieRepository.filterEpisodesBySerieAndYear(serieTitle, year);
+        episodes.forEach(episode -> System.out.printf("Title: %s | Released: %s\n",
+                episode.getTitle(), episode.getReleased()));
         System.out.println();
     }
 }
