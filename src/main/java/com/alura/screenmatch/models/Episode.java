@@ -1,6 +1,5 @@
 package com.alura.screenmatch.models;
 
-import com.alura.screenmatch.repositories.SerieRepository;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -30,7 +29,7 @@ public class Episode {
         try {
             this.rating = Double.valueOf(episodeData.rating());
         }
-        catch (NumberFormatException ex) {
+        catch (NumberFormatException exception) {
             this.rating = 0.0;
         }
         try {

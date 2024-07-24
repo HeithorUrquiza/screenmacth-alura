@@ -1,9 +1,6 @@
 package com.alura.screenmatch.principal;
 
-import com.alura.screenmatch.models.Episode;
-import com.alura.screenmatch.models.SeasonData;
-import com.alura.screenmatch.models.Serie;
-import com.alura.screenmatch.models.SerieData;
+import com.alura.screenmatch.models.*;
 import com.alura.screenmatch.repositories.SerieRepository;
 import com.alura.screenmatch.services.ApiConsumer;
 import com.alura.screenmatch.services.DataConversor;
@@ -36,6 +33,9 @@ public class Principal {
                 1 - Search series
                 2 - Search episodes
                 3 - List all series searched
+                4 - Search serie by title
+                5 - Show top 5 series
+                6 - Search serie by genre
                 0 - Leave
                 """;
 
@@ -54,6 +54,15 @@ public class Principal {
                     break;
                 case 3:
                     listAllSeriesSearched();
+                    break;
+                case 4:
+                    searchSerieByTitle();
+                    break;
+                case 5:
+                    getTop5Series();
+                    break;
+                case 6:
+                    searchSerieByGenre();
                     break;
                 case 0:
                     System.out.println("Leaving...");
@@ -87,10 +96,7 @@ public class Principal {
         this.listAllSeriesSearched();
         System.out.print("Choose a serie by its name: ");
         String serieName = scanner.nextLine();
-
-        Optional<Serie> optionalSerie = this.series.stream()
-                .filter(serie -> serie.getTitle().equalsIgnoreCase(serieName))
-                .findFirst();
+        Optional<Serie> optionalSerie = this.serieRepository.findByTitleIgnoreCase(serieName);
 
         if (optionalSerie.isPresent()) {
             Serie foundedSerie = optionalSerie.get();
@@ -124,5 +130,33 @@ public class Principal {
         this.series.stream()
                 .sorted(Comparator.comparing(Serie::getGenre))
                 .forEach(System.out::println);
+    }
+
+    private void searchSerieByTitle() {
+        System.out.print("Type a serie name: ");
+        String serieName = this.scanner.nextLine();
+        Optional<Serie> opitionalSerie = this.serieRepository.findByTitleIgnoreCase(serieName);
+        if (opitionalSerie.isPresent()) {
+            System.out.printf("Serie data: %s", opitionalSerie.get());
+        }
+        else {
+            System.out.println("Serie not founded");
+        }
+        System.out.println();
+    }
+
+    private void getTop5Series() {
+        List<Serie> series = this.serieRepository.findTop5ByOrderByRatingDesc();
+        series.forEach(serie -> System.out.printf("Title: %s | Rating: %.1f\n", serie.getTitle(), serie.getRating()));
+        System.out.println();
+    }
+
+    private void searchSerieByGenre() {
+        System.out.print("Type category name: ");
+        String categoryName = this.scanner.nextLine();
+        Category category = Category.getCategory(categoryName);
+        List<Serie> series = this.serieRepository.findByGenre(category);
+        series.forEach(serie -> System.out.printf("Title: %s | Genre: %s\n", serie.getTitle(), serie.getGenre()));
+        System.out.println();
     }
 }

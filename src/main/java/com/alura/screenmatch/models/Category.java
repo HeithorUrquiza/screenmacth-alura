@@ -15,7 +15,7 @@ public enum Category {
         this.omdbCategory = omdbCategory;
     }
 
-    public static Category fromString(String text) {
+    public static Category getCategory(String text) {
         for (Category category : Category.values()) {
             if (category.omdbCategory.equalsIgnoreCase(text)) {
                 return category;

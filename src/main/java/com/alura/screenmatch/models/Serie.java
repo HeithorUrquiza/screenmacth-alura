@@ -29,7 +29,7 @@ public class Serie {
         this.title = serieData.title();
         this.seasons = serieData.totalSeasons();
         this.rating = OptionalDouble.of(Double.parseDouble(serieData.rating())).orElse(0);
-        this.genre = Category.fromString(serieData.genre().split(",")[0].trim());
+        this.genre = Category.getCategory(serieData.genre().split(",")[0].trim());
         this.actors = serieData.actors();
         this.poster = serieData.poster();
         this.plot = serieData.plot();
