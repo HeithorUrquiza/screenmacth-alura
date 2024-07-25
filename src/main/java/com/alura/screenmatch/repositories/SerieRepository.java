@@ -14,6 +14,7 @@ public interface SerieRepository extends JpaRepository<Serie, Long> {
     Optional<Serie> findByTitleIgnoreCase(String serieName);
     List<Serie> findTop5ByOrderByRatingDesc();
     List<Serie> findByGenre(Category category);
+    List<Serie> findTop5ByOrderByEpisodesReleasedDesc();
 //    JPQL
     @Query("SELECT ep FROM Serie s JOIN s.episodes ep WHERE ep.title ILIKE %:sentence%")
     List<Episode> episodesBySentence(String sentence);

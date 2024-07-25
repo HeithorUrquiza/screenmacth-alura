@@ -2,6 +2,7 @@ package com.alura.screenmatch.models.dto;
 
 import com.alura.screenmatch.models.Category;
 
+// This class is responsable for the JSON return
 public record SerieDTO(
         Long id,
         String title,
