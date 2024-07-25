@@ -14,7 +14,7 @@ public interface SerieRepository extends JpaRepository<Serie, Long> {
     Optional<Serie> findByTitleIgnoreCase(String serieName);
     List<Serie> findTop5ByOrderByRatingDesc();
     List<Serie> findByGenre(Category category);
-    List<Serie> findTop5ByOrderByEpisodesReleasedDesc();
+
 //    JPQL
     @Query("SELECT ep FROM Serie s JOIN s.episodes ep WHERE ep.title ILIKE %:sentence%")
     List<Episode> episodesBySentence(String sentence);
@@ -40,4 +40,26 @@ public interface SerieRepository extends JpaRepository<Serie, Long> {
             """)
     List<Episode> filterEpisodesBySerieAndYear(String serieTitle, int released);
 
+    @Query("""
+            SELECT s FROM Serie s
+            JOIN s.episodes ep
+            GROUP BY s
+            ORDER BY MAX(ep.released) DESC LIMIT 5
+            """)
+    List<Serie> currentReleases();
+
+    @Query("""
+            SELECT ep FROM Serie s 
+            JOIN s.episodes ep 
+            WHERE s.id = :id AND ep.season = :seasonNumber
+            """)
+    List<Episode> getEpisodeBySeason(Long id, Long seasonNumber);
+
+    @Query("""
+            SELECT ep FROM Serie s
+            JOIN s.episodes ep
+            WHERE s.id = :id
+            ORDER BY ep.rating DESC LIMIT 5
+            """)
+    List<Episode> getTop5EpisodesBySerie(Long id);
 }
